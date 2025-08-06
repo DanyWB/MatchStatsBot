@@ -290,34 +290,43 @@ module.exports = async function matchHandler(bot) {
       color: #2196f3;
     }
 
-    .logo {
-      width: 50px;
-      height: 50px;
-      object-fit: contain;
-      border-radius: 6px;
-      background: white;
-    }
-.score-line {
+    .score-line {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  font-size: 36px;
-  font-weight: bold;
+  gap: 60px;
   margin-bottom: 5px;
-  gap: 15px;
+  margin-top: 10px;
 }
 
 .team-item {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 15px;
+  max-width: 40%;
+}
+
+.team-name {
+  font-size: 40px;
+  font-weight: bold;
+  white-space: nowrap;
 }
 
 .vs-text {
   color: white;
   opacity: 0.6;
-  font-size: 28px;
+  font-size: 30px;
+  font-weight: bold;
 }
+
+.logo {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  border-radius: 6px;
+  background: white;
+}
+
 
   </style>
 </head>
@@ -335,6 +344,7 @@ module.exports = async function matchHandler(bot) {
     <img src="${logoTeam2Base64}" class="logo" />
   </div>
 </div>
+
 
 
 
