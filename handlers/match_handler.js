@@ -149,6 +149,17 @@ module.exports = async function matchHandler(bot) {
 
       // Генерация HTML
       // Генерация HTML
+      const logoTeam1Path = `file://${path.resolve(
+        __dirname,
+        "../images/logo",
+        match.team1_logo || ""
+      )}`;
+      const logoTeam2Path = `file://${path.resolve(
+        __dirname,
+        "../images/logo",
+        match.team2_logo || ""
+      )}`;
+
       let html = `
 <!DOCTYPE html>
 <html lang="ru">
@@ -289,27 +300,18 @@ module.exports = async function matchHandler(bot) {
 </head>
 <body>
   <div class="score">
-  <div class="team team-left">
-    <img src="file://${path.resolve(
-      __dirname,
-      "../images/logo",
-      match.team1_logo
-    )}" class="logo" />
-    <span class="team-name">${match.team1}</span>
-  </div>
-  <div class="team team-right">
-    <img src="file://${path.resolve(
-      __dirname,
-      "../images/logo",
-      match.team2_logo
-    )}" class="logo" />
-    <span class="team-name">${match.team2}</span>
-  </div>
+      <div class="team team-left">
+  <img src="${logoTeam1Path}" class="logo" />
+  <span class="team-name">${match.team1}</span>
+</div>
+<div class="team team-right">
+  <img src="${logoTeam2Path}" class="logo" />
+  <span class="team-name">${match.team2}</span>
 </div>
 
-  <div class="info">${formattedDate} – ${formattedTime} – "${
-        match.stadium
-      }"</div>
+  </div>
+
+  <div class="info">${formattedDate} – ${formattedTime} – "${match.stadium}"</div>
 `;
 
       let currentGroup = null;
