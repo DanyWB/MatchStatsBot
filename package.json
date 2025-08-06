@@ -1,0 +1,22 @@
+{
+  "name": "vpn-bot",
+  "version": "1.0.0",
+  "description": "Telegram VPN sales bot with grammY and PostgreSQL",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js",
+    "migrate": "knex migrate:latest --knexfile db/knexfile.js",
+    "rollback": "knex migrate:rollback --knexfile db/knexfile.js",
+    "seed": "knex seed:run --knexfile db/knexfile.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "grammy": "^1.24.0",
+    "knex": "^3.1.0",
+    "node-html-to-image": "^5.0.0",
+    "pg": "^8.11.1",
+    "puppeteer": "^24.15.0"
+  },
+  "author": "",
+  "license": "ISC"
+}
