@@ -110,6 +110,8 @@ module.exports = async function matchHandler(bot) {
           "rounds.number as round",
           "t1.name as team1",
           "t2.name as team2",
+          "t1.file_name_logo as team1_logo",
+          "t2.file_name_logo as team2_logo",
           "matches.date",
           "matches.time",
           "stadiums.name as stadium"
@@ -257,15 +259,57 @@ module.exports = async function matchHandler(bot) {
       position: relative;
       z-index: 1;
     }
+      .team {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 30px;
+      justify-content: center;
+    }
+
+    .team-left {
+      flex-direction: row;
+      color: #e91e63;
+    }
+
+    .team-right {
+      flex-direction: row-reverse;
+      color: #2196f3;
+    }
+
+    .logo {
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+      border-radius: 6px;
+      background: white;
+    }
+
   </style>
 </head>
 <body>
   <div class="score">
-    <span class="team-name team-left">${match.team1}</span>
-    &nbsp;vs&nbsp;
-    <span class="team-name team-right">${match.team2}</span>
+  <div class="team team-left">
+    <img src="file://${path.resolve(
+      __dirname,
+      "../images/logo",
+      match.team1_logo
+    )}" class="logo" />
+    <span class="team-name">${match.team1}</span>
   </div>
-  <div class="info">${formattedDate} – ${formattedTime} – "${match.stadium}"</div>
+  <div class="team team-right">
+    <img src="file://${path.resolve(
+      __dirname,
+      "../images/logo",
+      match.team2_logo
+    )}" class="logo" />
+    <span class="team-name">${match.team2}</span>
+  </div>
+</div>
+
+  <div class="info">${formattedDate} – ${formattedTime} – "${
+        match.stadium
+      }"</div>
 `;
 
       let currentGroup = null;
