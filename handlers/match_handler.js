@@ -300,8 +300,8 @@ module.exports = async function matchHandler(bot) {
           const left = parse(stat.value_team1);
           const right = parse(stat.value_team2);
 
-          const leftGrow = left || 0.01;
-          const rightGrow = right || 0.01;
+          const leftGrow = left * 10 || 0.01;
+          const rightGrow = right * 10 || 0.01;
 
           html += `
       <div class="stat-row">
@@ -346,10 +346,3 @@ module.exports = async function matchHandler(bot) {
     }
   });
 };
-function formatDate(isoDate) {
-  const d = new Date(isoDate);
-  const day = String(d.getDate()).padStart(2, "0");
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-  const year = d.getFullYear();
-  return `${day}.${month}.${year}`;
-}
