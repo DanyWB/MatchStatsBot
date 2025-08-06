@@ -297,20 +297,45 @@ module.exports = async function matchHandler(bot) {
       border-radius: 6px;
       background: white;
     }
+.score-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 5px;
+  gap: 15px;
+}
+
+.team-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.vs-text {
+  color: white;
+  opacity: 0.6;
+  font-size: 28px;
+}
 
   </style>
 </head>
 <body>
-  <div class="score">
-  <div class="team team-left">
+  <div class="score-line">
+  <div class="team-item">
     <img src="${logoTeam1Base64}" class="logo" />
-    <span class="team-name">${match.team1}</span>
+    <span class="team-name team-left">${match.team1}</span>
   </div>
-  <div class="team team-right">
+
+  <span class="vs-text">vs</span>
+
+  <div class="team-item">
+    <span class="team-name team-right">${match.team2}</span>
     <img src="${logoTeam2Base64}" class="logo" />
-    <span class="team-name">${match.team2}</span>
   </div>
 </div>
+
 
 
   <div class="info">${formattedDate} – ${formattedTime} – "${match.stadium}"</div>
