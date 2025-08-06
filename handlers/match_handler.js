@@ -301,7 +301,7 @@ module.exports = async function matchHandler(bot) {
 <body>
   <div class="score">
       <div class="team team-left">
-  <img src="${logoTeam1Path}" class="logo" />
+  <img src="${logoTeam1Path} class="logo" />
   <span class="team-name">${match.team1}</span>
 </div>
 <div class="team team-right">
@@ -313,7 +313,7 @@ module.exports = async function matchHandler(bot) {
 
   <div class="info">${formattedDate} – ${formattedTime} – "${match.stadium}"</div>
 `;
-
+      console.log(logoTeam1Path);
       let currentGroup = null;
       for (const stat of stats) {
         if (stat.group_name !== currentGroup) {
