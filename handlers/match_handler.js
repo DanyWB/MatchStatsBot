@@ -148,17 +148,19 @@ module.exports = async function matchHandler(bot) {
       const formattedTime = match.time.slice(0, 5);
 
       // Генерация HTML
-      // Генерация HTML
-      const logoTeam1Path = `file://${path.resolve(
+      const logoTeam1Path = path.resolve(
         __dirname,
         "../images/logo",
         match.team1_logo || ""
-      )}`;
-      const logoTeam2Path = `file://${path.resolve(
+      );
+      const logoTeam2Path = path.resolve(
         __dirname,
         "../images/logo",
         match.team2_logo || ""
-      )}`;
+      );
+
+      const logoTeam1Base64 = toBase64(logoTeam1Path);
+      const logoTeam2Base64 = toBase64(logoTeam2Path);
 
       let html = `
 <!DOCTYPE html>
@@ -300,16 +302,16 @@ module.exports = async function matchHandler(bot) {
 </head>
 <body>
   <div class="score">
-      <div class="team team-left">
-  <img src="${logoTeam1Path} class="logo" />
-  <span class="team-name">${match.team1}</span>
-</div>
-<div class="team team-right">
-  <img src="${logoTeam2Path}" class="logo" />
-  <span class="team-name">${match.team2}</span>
+  <div class="team team-left">
+    <img src="${logoTeam1Base64}" class="logo" />
+    <span class="team-name">${match.team1}</span>
+  </div>
+  <div class="team team-right">
+    <img src="${logoTeam2Base64}" class="logo" />
+    <span class="team-name">${match.team2}</span>
+  </div>
 </div>
 
-  </div>
 
   <div class="info">${formattedDate} – ${formattedTime} – "${match.stadium}"</div>
 `;
@@ -392,3 +394,10 @@ module.exports = async function matchHandler(bot) {
     }
   });
 };
+
+function toBase64(filePath) {
+  if (!fs.existsSync(filePath)) return null;
+  const buffer = fs.readFileSync(filePath);
+  const ext = path.extname(filePath).slice(1); // 'png', 'jpg'
+  return `data:image/${ext};base64,${buffer.toString("base64")}`;
+}
