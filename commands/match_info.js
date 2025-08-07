@@ -21,13 +21,13 @@ module.exports = (bot) => {
         .orderBy("matches.date", "desc");
 
       if (!matches.length) {
-        return ctx.reply("⚠️ Пока нет доступных матчей.");
+        return ctx.reply("⚠️ Наразі немає доступних матчів.");
       }
 
       const keyboard = new InlineKeyboard();
       for (const match of matches) {
         const date = new Date(match.date);
-        const formattedDate = date.toLocaleDateString("ru-RU"); // формат: дд.мм.гггг
+        const formattedDate = date.toLocaleDateString("uk-UA"); // формат: дд.мм.рррр
 
         keyboard
           .text(
@@ -37,12 +37,12 @@ module.exports = (bot) => {
           .row();
       }
 
-      return ctx.reply("📋 Выберите матч для просмотра информации:", {
+      return ctx.reply("📋 Оберіть матч для перегляду інформації:", {
         reply_markup: keyboard,
       });
     } catch (err) {
       console.error("match_info command error:", err);
-      return ctx.reply("❌ Ошибка при загрузке матчей.");
+      return ctx.reply("❌ Сталася помилка під час завантаження матчів.");
     }
   });
 };

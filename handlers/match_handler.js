@@ -119,7 +119,7 @@ module.exports = async function matchHandler(bot) {
         .first();
 
       if (!match) {
-        return ctx.reply("❌ Матч не найден.");
+        return ctx.reply("❌ Матч не знайдено.");
       }
 
       const stats = await db("match_stats")
@@ -164,7 +164,7 @@ module.exports = async function matchHandler(bot) {
 
       let html = `
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="uk">
 <head>
   <meta charset="UTF-8" />
   <style>
@@ -425,7 +425,7 @@ module.exports = async function matchHandler(bot) {
       await ctx.answerCallbackQuery();
     } catch (err) {
       console.error("match:info error:", err);
-      return ctx.reply("❌ Ошибка при генерации статистики матча.");
+      return ctx.reply("❌ Помилка при генерації статистики матчу.");
     }
   });
 };
