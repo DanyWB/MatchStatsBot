@@ -167,14 +167,18 @@ module.exports = async function matchHandler(bot) {
 <html lang="uk">
 <head>
   <meta charset="UTF-8" />
+  <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@600&family=Roboto:wght@400&display=swap" rel="stylesheet">
+
+
   <style>
     body {
       background-color: #0e0e0e;
       color: white;
       font-family: Arial, sans-serif;
-      padding: 20px;
+
       font-size: 22px;
-      width: 1100px;
+      width: 1400px;
+      padding: 70px 20px 10px 20px;
     }
     .score {
       text-align: center;
@@ -192,16 +196,17 @@ module.exports = async function matchHandler(bot) {
     }
     .info {
       text-align: center;
-      margin-bottom: 30px;
-      font-size: 18px;
+      margin-bottom: 50px;
+      font-size: 58px;
       opacity: 0.8;
+      
     }
     .stat-block {
       display: flex;
       flex-direction: column;
       gap: 8px;
       width: 100%;
-      margin-bottom: 20px;
+      margin-bottom: 60px;
     }
     .stat-row {
       display: flex;
@@ -222,15 +227,20 @@ module.exports = async function matchHandler(bot) {
       flex: 2;
       background-color: #0e0e0e;
       color: #d6d6d6;
-      font-size: 30px;
+      font-size: 46px;
+      padding-bottom: 40px;
+      font-weight: 400;
+      font-family: 'Roboto', sans-serif;
     }
     .cell.left {
       background-color: #e91e63;
       color: white;
+      font-size: 50px;
     }
     .cell.right {
       background-color: #2196f3;
       color: white;
+      font-size: 50px;
     }
     .cell.middle {
       background-color: #333333;
@@ -240,10 +250,15 @@ module.exports = async function matchHandler(bot) {
     .group-title {
       text-align: center;
       margin: 20px 0 10px;
-      font-size: 36px;
-      font-weight: bold;
-      border-bottom: 2px solid #444;
+      font-size: 56px;
+      border-bottom: 8px solid #444;
       padding-bottom: 4px;
+      color: #d6d6d6;
+      font-family: 'Exo 2', sans-serif;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+
     }
     .bar-container {
       position: relative;
@@ -271,6 +286,7 @@ module.exports = async function matchHandler(bot) {
     .bar-value {
       position: relative;
       z-index: 1;
+      
     }
       .team {
       display: flex;
@@ -294,8 +310,8 @@ module.exports = async function matchHandler(bot) {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 60px;
-  margin-bottom: 5px;
+  gap: 80px;
+  margin-bottom: 25px;
   margin-top: 10px;
 }
 
@@ -307,7 +323,7 @@ module.exports = async function matchHandler(bot) {
 }
 
 .team-name {
-  font-size: 40px;
+  font-size: 70px;
   font-weight: bold;
   white-space: nowrap;
 }
@@ -320,8 +336,8 @@ module.exports = async function matchHandler(bot) {
 }
 
 .logo {
-  width: 50px;
-  height: 50px;
+  width: 150px;
+  height: 150px;
   object-fit: contain;
   border-radius: 6px;
   background: white;
