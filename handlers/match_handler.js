@@ -313,60 +313,73 @@ module.exports = async function matchHandler(bot) {
       color: #2196f3;
     }
 
-    .score-line {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 80px;
-  margin-bottom: 25px;
-  margin-top: 10px;
-}
+     .score-line {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr; 
+    align-items: end;
+    gap: 40px;
+    margin-bottom: 25px;
+    margin-top: 10px;
+  }
 
-.team-item {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  max-width: 40%;
-}
+ .team-item {
+    display: flex;
+    flex-direction: column;     
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    max-width: 100%;
+  }
 
 .team-name {
-  font-size: 70px;
-  font-weight: bold;
-  white-space: nowrap;
-}
+    /* авто‑масштаб + перенос + ограничение ширины */
+    font-weight: 700;
+    text-align: center;
+    line-height: 1.1;
+    max-width: 90%;
+    white-space: normal;          /* разрешаем переносы */
+    word-break: break-word;       /* ломаем длинные слова/дефисы */
+    overflow-wrap: anywhere;
+    font-size: clamp(32px, 4vw, 64px); /* авто‑масштаб под ширину рендера */
+  }
+.team-left  { color: #e91e63; }
+  .team-right { color: #2196f3; }
 
-.vs-text {
-  color: white;
-  opacity: 0.6;
-  font-size: 30px;
-  font-weight: bold;
-}
+  .vs-text {
+    color: #fff;
+    opacity: 0.7;
+    font-weight: 700;
+    font-size: clamp(22px, 2.2vw, 34px);
+    align-self: center;
+  }
 
-.logo {
-  width: 150px;
-  height: 150px;
-  object-fit: contain;
-  border-radius: 6px;
-  background: white;
-}
+ .logo {
+    width: 120px;         
+    height: 120px;
+    object-fit: contain;
+    border-radius: 6px;
+    background: white;
+    flex: 0 0 auto;
+  }
 
 
   </style>
 </head>
 <body>
-  <div class="score-line">
-  <div class="team-item">
+<div class="score-line">
+  <div class="team-item left">
     <img src="${logoTeam1Base64}" class="logo" />
     <span class="team-name team-left">${match.team1}</span>
   </div>
 
   <span class="vs-text">vs</span>
 
-  <div class="team-item">
-    <span class="team-name team-right">${match.team2}</span>
+  <div class="team-item right">
     <img src="${logoTeam2Base64}" class="logo" />
+    <span class="team-name team-right">${match.team2}</span>
   </div>
 </div>
+
 
 
 
