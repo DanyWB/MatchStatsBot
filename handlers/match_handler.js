@@ -158,9 +158,15 @@ module.exports = async function matchHandler(bot) {
         "../images/logo",
         match.team2_logo || ""
       );
+      const defaultLogoPath = path.resolve(
+        __dirname,
+        "../images/logo/default.png"
+      );
 
-      const logoTeam1Base64 = toBase64(logoTeam1Path);
-      const logoTeam2Base64 = toBase64(logoTeam2Path);
+      const logoTeam1Base64 =
+        toBase64(logoTeam1Path) || toBase64(defaultLogoPath);
+      const logoTeam2Base64 =
+        toBase64(logoTeam2Path) || toBase64(defaultLogoPath);
 
       let html = `
 <!DOCTYPE html>
