@@ -332,15 +332,14 @@ module.exports = async function matchHandler(bot) {
   }
 
 .team-name {
-    /* авто‑масштаб + перенос + ограничение ширины */
     font-weight: 700;
     text-align: center;
     line-height: 1.1;
     max-width: 90%;
-    white-space: normal;          /* разрешаем переносы */
-    word-break: break-word;       /* ломаем длинные слова/дефисы */
+    white-space: normal;          
+    word-break: break-word;       
     overflow-wrap: anywhere;
-    font-size: clamp(32px, 4vw, 64px); /* авто‑масштаб под ширину рендера */
+    font-size: 50px; 
   }
 .team-left  { color: #e91e63; }
   .team-right { color: #2196f3; }
@@ -349,7 +348,7 @@ module.exports = async function matchHandler(bot) {
     color: #fff;
     opacity: 0.7;
     font-weight: 700;
-    font-size: clamp(22px, 2.2vw, 34px);
+    font-size: 30px;
     align-self: center;
   }
 
