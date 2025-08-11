@@ -447,8 +447,22 @@ module.exports = async function matchHandler(bot) {
 };
 
 function toBase64(filePath) {
-  if (!fs.existsSync(filePath)) return null;
-  const buffer = fs.readFileSync(filePath);
-  const ext = path.extname(filePath).slice(1); // 'png', 'jpg'
-  return `data:image/${ext};base64,${buffer.toString("base64")}`;
+  try {
+    // Проверка: путь пустой или файл не существует
+    if (!filePath || !fs.existsSync(filePath)) {
+      return null;
+    }
+
+    // Проверка: это точно файл, а не директория
+    if (fs.lstatSync(filePath).isDirectory()) {
+      return null;
+    }
+
+    const buffer = fs.readFileSync(filePath);
+    const ext = path.extname(filePath).slice(1).toLowerCase(); // 'png', 'jpg'
+    return `data:image/${ext};base64,${buffer.toString("base64")}`;
+  } catch (err) {
+    console.error(`Ошибка при конвертации файла в Base64: ${filePath}`, err);
+    return null;
+  }
 }
