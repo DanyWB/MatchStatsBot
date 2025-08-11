@@ -252,6 +252,7 @@ module.exports = async function matchHandler(bot) {
       background-color: #333333;
       color: white;
       flex: 1.2;
+      font-size: 50px;
     }
     .group-title {
       text-align: center;
