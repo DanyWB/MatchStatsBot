@@ -96,7 +96,12 @@ module.exports = async function matchHandler(bot) {
   });
   bot.callbackQuery(/^match:info:(\d+)$/, async (ctx) => {
     const match_id = Number(ctx.match[1]);
-
+    try {
+      await ctx.answerCallbackQuery({
+        text: "Генеруємо зображення…",
+        show_alert: false,
+      });
+    } catch {}
     try {
       const match = await db("matches")
         .join("teams as t1", "matches.team1_id", "t1.id")
@@ -339,7 +344,7 @@ module.exports = async function matchHandler(bot) {
     white-space: normal;          
     word-break: break-word;       
     overflow-wrap: anywhere;
-    font-size: 50px; 
+    font-size: 64px; 
   }
 .team-left  { color: #e91e63; }
   .team-right { color: #2196f3; }
@@ -457,7 +462,6 @@ module.exports = async function matchHandler(bot) {
       });
 
       await ctx.replyWithPhoto(new InputFile(filePath));
-      await ctx.answerCallbackQuery();
     } catch (err) {
       console.error("match:info error:", err);
       return ctx.reply("❌ Помилка при генерації статистики матчу.");
