@@ -3,7 +3,7 @@ const nodeHtmlToImage = require("node-html-to-image");
 const fs = require("fs");
 const path = require("path");
 const {InputFile} = require("grammy");
-
+const {InlineKeyboard} = require("grammy");
 module.exports = async function matchHandler(bot) {
   bot.callbackQuery(/^match:tournament:(\d+)$/, async (ctx) => {
     console.log(1);
@@ -93,6 +93,114 @@ module.exports = async function matchHandler(bot) {
     ctx.session.await_field = "match_date";
     await ctx.answerCallbackQuery();
     await ctx.editMessageText("📅 Введите дату матча в формате ДД.ММ.ГГГГ:");
+  });
+
+  // match info
+  // Выбор турнира → список туров этого турнира
+  bot.callbackQuery(/^match:tourn:(\d+)$/, async (ctx) => {
+    try {
+      await ctx.answerCallbackQuery().catch(() => {});
+      const tournamentId = Number(ctx.match[1]);
+
+      // все туры (rounds), в которых есть матчи выбранного турнира
+      const rounds = await db("rounds")
+        .join("matches", "matches.round_id", "rounds.id")
+        .where("matches.tournament_id", tournamentId)
+        .distinct("rounds.id", "rounds.number")
+        .orderBy("rounds.number", "asc");
+
+      if (!rounds.length) {
+        return ctx.editMessageText(
+          "⚠️ Для цього турніру немає доступних турів."
+        );
+      }
+
+      const kb = new InlineKeyboard();
+      for (const r of rounds) {
+        kb.text(`Тур ${r.number}`, `match:round:${tournamentId}:${r.id}`).row();
+      }
+      kb.text("⬅️ Назад до турнірів", `match:back:tournaments`);
+
+      return ctx.editMessageText("📅 Оберіть тур:", {reply_markup: kb});
+    } catch (err) {
+      console.error("match:tourn error:", err);
+      return ctx.reply("❌ Сталася помилка під час завантаження турів.");
+    }
+  });
+
+  // Кнопка «Назад к турнирам»
+  bot.callbackQuery(/^match:back:tournaments$/, async (ctx) => {
+    try {
+      await ctx.answerCallbackQuery().catch(() => {});
+      const tournaments = await db("tournaments")
+        .join("matches", "matches.tournament_id", "tournaments.id")
+        .distinct("tournaments.id", "tournaments.name")
+        .orderBy("tournaments.name", "asc");
+
+      if (!tournaments.length) {
+        return ctx.editMessageText("⚠️ Наразі немає доступних турнірів.");
+      }
+
+      const kb = new InlineKeyboard();
+      for (const t of tournaments) kb.text(t.name, `match:tourn:${t.id}`).row();
+
+      return ctx.editMessageText("🏆 Оберіть турнір:", {reply_markup: kb});
+    } catch (err) {
+      console.error("match:back:tournaments error:", err);
+      return ctx.reply("❌ Сталася помилка під час завантаження турнірів.");
+    }
+  });
+
+  // Выбор тура → список матчей этого тура в выбранном турнире
+  bot.callbackQuery(/^match:round:(\d+):(\d+)$/, async (ctx) => {
+    try {
+      await ctx.answerCallbackQuery().catch(() => {});
+      const tournamentId = Number(ctx.match[1]);
+      const roundId = Number(ctx.match[2]);
+
+      const matches = await db("matches")
+        .join("teams as t1", "matches.team1_id", "t1.id")
+        .join("teams as t2", "matches.team2_id", "t2.id")
+        .select(
+          "matches.id",
+          "t1.name as team1",
+          "t2.name as team2",
+          "matches.date",
+          "matches.time"
+        )
+        .where({
+          "matches.tournament_id": tournamentId,
+          "matches.round_id": roundId,
+        })
+        .orderBy("matches.date", "desc");
+
+      if (!matches.length) {
+        const kb = new InlineKeyboard().text(
+          "⬅️ Назад до турів",
+          `match:tourn:${tournamentId}`
+        );
+        return ctx.editMessageText("⚠️ У цьому турі немає матчів.", {
+          reply_markup: kb,
+        });
+      }
+
+      const kb = new InlineKeyboard();
+      for (const m of matches) {
+        const formattedDate = new Date(m.date).toLocaleDateString("uk-UA");
+        kb.text(
+          `${m.team1} vs ${m.team2} (${formattedDate})`,
+          `match:info:${m.id}`
+        ).row();
+      }
+      kb.text("⬅️ Назад до турів", `match:tourn:${tournamentId}`)
+        .row()
+        .text("⬅️⬅️ До турнірів", `match:back:tournaments`);
+
+      return ctx.editMessageText("📋 Оберіть матч:", {reply_markup: kb});
+    } catch (err) {
+      console.error("match:round error:", err);
+      return ctx.reply("❌ Сталася помилка під час завантаження матчів.");
+    }
   });
   bot.callbackQuery(/^match:info:(\d+)$/, async (ctx) => {
     const match_id = Number(ctx.match[1]);
