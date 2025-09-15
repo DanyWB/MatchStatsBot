@@ -4,6 +4,8 @@ const fs = require("fs");
 const path = require("path");
 const {InputFile} = require("grammy");
 const {InlineKeyboard} = require("grammy");
+const pLimit = require("p-limit");
+const renderLimit = pLimit(2);
 module.exports = async function matchHandler(bot) {
   bot.callbackQuery(/^match:tournament:(\d+)$/, async (ctx) => {
     console.log(1);
@@ -208,6 +210,7 @@ module.exports = async function matchHandler(bot) {
       await ctx.answerCallbackQuery({
         text: "Генеруємо зображення…",
         show_alert: false,
+        cache_time: 0,
       });
     } catch {}
     try {
@@ -261,25 +264,20 @@ module.exports = async function matchHandler(bot) {
       const formattedTime = match.time.slice(0, 5);
 
       // Генерация HTML
-      const logoTeam1Path = path.resolve(
-        __dirname,
-        "../images/logo",
-        match.team1_logo || ""
-      );
-      const logoTeam2Path = path.resolve(
-        __dirname,
-        "../images/logo",
-        match.team2_logo || ""
-      );
-      const defaultLogoPath = path.resolve(
-        __dirname,
-        "../images/logo/default.png"
-      );
 
-      const logoTeam1Base64 =
-        toBase64(logoTeam1Path) || toBase64(defaultLogoPath);
-      const logoTeam2Base64 =
-        toBase64(logoTeam2Path) || toBase64(defaultLogoPath);
+      const logoTeam1Path = safeResolveLogoPath(match.team1_logo);
+      const logoTeam2Path = safeResolveLogoPath(match.team2_logo);
+
+      const logoTeam1Base64 = toBase64(logoTeam1Path);
+      const logoTeam2Base64 = toBase64(logoTeam2Path);
+
+      // Генерируем теги только если есть base64
+      const team1LogoTag = logoTeam1Base64
+        ? `<img src="${logoTeam1Base64}" class="logo" />`
+        : "";
+      const team2LogoTag = logoTeam2Base64
+        ? `<img src="${logoTeam2Base64}" class="logo" />`
+        : "";
 
       let html = `
 <!DOCTYPE html>
@@ -480,14 +478,14 @@ module.exports = async function matchHandler(bot) {
 <body>
 <div class="score-line">
   <div class="team-item left">
-    <img src="${logoTeam1Base64}" class="logo" />
+     ${team1LogoTag}
     <span class="team-name team-left">${match.team1}</span>
   </div>
 
   <span class="vs-text">vs</span>
 
   <div class="team-item right">
-    <img src="${logoTeam2Base64}" class="logo" />
+     ${team2LogoTag}
     <span class="team-name team-right">${match.team2}</span>
   </div>
 </div>
@@ -498,7 +496,7 @@ module.exports = async function matchHandler(bot) {
 
   <div class="info">${formattedDate} – ${formattedTime} – "${match.stadium}"</div>
 `;
-      console.log(logoTeam1Path);
+
       let currentGroup = null;
       for (const stat of stats) {
         if (stat.group_name !== currentGroup) {
@@ -562,12 +560,37 @@ module.exports = async function matchHandler(bot) {
         __dirname,
         `../images/match_${match_id}_stats.png`
       );
-      await nodeHtmlToImage({
-        output: filePath,
-        html: html,
-        type: "png",
-        quality: 100,
-      });
+      // ---- logs
+      console.log(
+        "[match:info] team1_logo from DB:",
+        match.team1_logo,
+        "→",
+        logoTeam1Path
+      );
+      console.log(
+        "[match:info] team2_logo from DB:",
+        match.team2_logo,
+        "→",
+        logoTeam2Path
+      );
+      // ----
+      await renderLimit(() =>
+        nodeHtmlToImage({
+          output: filePath,
+          html: html,
+          type: "png",
+          quality: 100,
+          puppeteerArgs: {
+            args: [
+              "--no-sandbox",
+              "--disable-setuid-sandbox",
+              "--disable-dev-shm-usage",
+              "--disable-gpu",
+            ],
+          },
+          waitUntil: "networkidle0",
+        })
+      );
 
       await ctx.replyWithPhoto(new InputFile(filePath));
     } catch (err) {
@@ -577,23 +600,48 @@ module.exports = async function matchHandler(bot) {
   });
 };
 
+function normalizeFsPath(p) {
+  if (!p) return null;
+  p = p.replace(/\\/g, "/"); // windows слэши → unix
+  return p.replace(/\/+$/, ""); // убираем хвостовые /
+}
+
+function safeResolveLogoPath(fileName, opts = {}) {
+  const baseDir = path.resolve(__dirname, "../images/logo");
+  const fromDb = normalizeFsPath(fileName);
+  const candidates = [];
+
+  // 1) абсолютный путь из БД
+  if (fromDb && path.isAbsolute(fromDb)) candidates.push(fromDb);
+
+  // 2) относительный из БД
+  if (fromDb && !path.isAbsolute(fromDb))
+    candidates.push(path.join(baseDir, fromDb));
+
+  // 3) дефолт
+  if (opts.includeDefault !== false) {
+    candidates.push(path.join(baseDir, "default.png"));
+  }
+
+  for (const f of candidates) {
+    try {
+      const st = fs.statSync(f);
+      if (st.isFile()) return f;
+    } catch (_e) {}
+  }
+  return null;
+}
+
 function toBase64(filePath) {
   try {
-    // Проверка: путь пустой или файл не существует
-    if (!filePath || !fs.existsSync(filePath)) {
-      return null;
-    }
-
-    // Проверка: это точно файл, а не директория
-    if (fs.lstatSync(filePath).isDirectory()) {
-      return null;
-    }
-
-    const buffer = fs.readFileSync(filePath);
-    const ext = path.extname(filePath).slice(1).toLowerCase(); // 'png', 'jpg'
-    return `data:image/${ext};base64,${buffer.toString("base64")}`;
+    if (!filePath) return null;
+    const st = fs.statSync(filePath);
+    if (!st.isFile()) return null; // защита от директорий
+    const buf = fs.readFileSync(filePath);
+    const ext = (path.extname(filePath).slice(1) || "png").toLowerCase();
+    return `data:image/${ext};base64,${buf.toString("base64")}`;
   } catch (err) {
-    console.error(`Ошибка при конвертации файла в Base64: ${filePath}`, err);
+    console.error("Logo read fail:", filePath, err.message);
     return null;
   }
 }
